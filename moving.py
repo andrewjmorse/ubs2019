@@ -8,18 +8,19 @@ import os
 # create a list for the sector dataframes
 sectors = []
 
+# store MSCI world index data
 msci = pd.read_csv('historyIndex.csv')[550:581]
-msci = msci.drop(['Date'], axis=1)
-new_index = pd.date_range('2016-10', periods=len(msci), freq="M")
+msci = msci.drop(['Date'], axis=1) # remove bad columns
+new_index = pd.date_range('2016-10', periods=len(msci), freq="M") # use date as index
 msci.index = new_index
-msci.columns = ['close']
+msci.columns = ['close'] # rename value for simplicity
 
 # read and format sector dataframes
 for file in os.listdir('Sectors/'):
     tmp = pd.read_csv('Sectors/{}'.format(file))
-    tmp = tmp.drop(['Unnamed: 0'], axis=1)
+    tmp = tmp.drop(['Unnamed: 0'], axis=1) # remove bad columns
     tmp = tmp.drop(['date'], axis=1)
-    new_index = pd.date_range('2016-11-01', periods=len(tmp), freq="D")
+    new_index = pd.date_range('2016-11-01', periods=len(tmp), freq="D") # use date as index
     tmp.index = new_index
     sectors.append(tmp)
 
