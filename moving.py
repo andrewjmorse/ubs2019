@@ -8,6 +8,12 @@ import os
 # create a list for the sector dataframes
 sectors = []
 
+msci = pd.read_csv('historyIndex.csv')[550:581]
+msci = msci.drop(['Date'], axis=1)
+new_index = pd.date_range('2016-10', periods=len(msci), freq="M")
+msci.index = new_index
+msci.columns = ['close']
+
 # read and format sector dataframes
 for file in os.listdir('Sectors/'):
     tmp = pd.read_csv('Sectors/{}'.format(file))
