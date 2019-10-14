@@ -4,6 +4,7 @@ import datetime
 import matplotlib
 import matplotlib.pyplot as plt
 import os
+import statsmodels.regression.linear_model as sm
 
 # create a list for the sector dataframes
 sectors = []
@@ -91,37 +92,57 @@ for x in [movingdif7, movingdif14, movingdif30, movingdif60]:
         x.append(df)
     i += 1 # move to next window
 
-ric = 'AAP' # stock ticker to display
+# ric = 'AAP' # stock ticker to display
 
-# plot
-plt.plot(sectors[0][ric])
-plt.plot(moving7[0][ric])
-plt.plot(moving14[0][ric])
-plt.plot(moving30[0][ric])
-plt.plot(moving60[0][ric])
-plt.legend([ric,'{} days'.format(dist[0]),'{} days'.format(dist[1]),'{} days'.format(dist[2]),'{} days'.format(dist[3])])
-plt.show()
+# # plot
+# plt.plot(sectors[0][ric])
+# plt.plot(moving7[0][ric])
+# plt.plot(moving14[0][ric])
+# plt.plot(moving30[0][ric])
+# plt.plot(moving60[0][ric])
+# plt.legend([ric,'{} days'.format(dist[0]),'{} days'.format(dist[1]),'{} days'.format(dist[2]),'{} days'.format(dist[3])])
+# plt.show()
+#
+# plt.plot(sectors[0][ric])
+# plt.plot(movingsd7[0][ric])
+# plt.plot(movingsd14[0][ric])
+# plt.plot(movingsd30[0][ric])
+# plt.plot(movingsd60[0][ric])
+# plt.legend([ric,'{} days'.format(dist[0]),'{} days'.format(dist[1]),'{} days'.format(dist[2]),'{} days'.format(dist[3])])
+# plt.show()
+#
+# plt.plot(sectors[0][ric])
+# plt.plot(movingdd7[0][ric])
+# plt.plot(movingdd14[0][ric])
+# plt.plot(movingdd30[0][ric])
+# plt.plot(movingdd60[0][ric])
+# plt.legend([ric,'{} days'.format(dist[0]),'{} days'.format(dist[1]),'{} days'.format(dist[2]),'{} days'.format(dist[3])])
+# plt.show()
+#
+# plt.plot(sectors[0][ric])
+# plt.plot(movingdif7[0][ric])
+# plt.plot(movingdif14[0][ric])
+# plt.plot(movingdif30[0][ric])
+# plt.plot(movingdif60[0][ric])
+# plt.legend([ric,'{} days'.format(dist[0]),'{} days'.format(dist[1]),'{} days'.format(dist[2]),'{} days'.format(dist[3])])
+# plt.show()
 
-plt.plot(sectors[0][ric])
-plt.plot(movingsd7[0][ric])
-plt.plot(movingsd14[0][ric])
-plt.plot(movingsd30[0][ric])
-plt.plot(movingsd60[0][ric])
-plt.legend([ric,'{} days'.format(dist[0]),'{} days'.format(dist[1]),'{} days'.format(dist[2]),'{} days'.format(dist[3])])
-plt.show()
+r2 = [] # list of lists of Pearson's r**2, separated by predictor and then by sector
 
-plt.plot(sectors[0][ric])
-plt.plot(movingdd7[0][ric])
-plt.plot(movingdd14[0][ric])
-plt.plot(movingdd30[0][ric])
-plt.plot(movingdd60[0][ric])
-plt.legend([ric,'{} days'.format(dist[0]),'{} days'.format(dist[1]),'{} days'.format(dist[2]),'{} days'.format(dist[3])])
-plt.show()
+for x in [moving7, moving14, moving30, moving60, movingsd7, movingsd14, movingsd30, movingsd60]:
+    sectorr2 = [] # list of r**2 for each sector
+    for i in range(len(x)):
+        stockr2 = [] # list of r**2 for each stock
+        for col in x[i]:
+            model = sm.GLS(sectors[i][col],x[i][col],missing='drop') # predict stock value from predictor, using GLS
+            result = model.fit()
+            stockr2.append(result.rsquared_adj) # extract model r**2
+        stockr2 = np.array(stockr2)
+        sectorr2.append(np.mean(stockr2))
+    r2.append(sectorr2)
 
-plt.plot(sectors[0][ric])
-plt.plot(movingdif7[0][ric])
-plt.plot(movingdif14[0][ric])
-plt.plot(movingdif30[0][ric])
-plt.plot(movingdif60[0][ric])
-plt.legend([ric,'{} days'.format(dist[0]),'{} days'.format(dist[1]),'{} days'.format(dist[2]),'{} days'.format(dist[3])])
-plt.show()
+score = [] # list of dataframes of day-to-day score date
+
+for i in range(len(sectors)):
+    df = r2[0][i]*moving7[i] + r2[1][i]*moving14[i] + r2[2][i]*moving30[i] + r2[3][i]*moving60[i] - r2[4][i]*movingsd7[i] - r2[5][i]*movingsd14[i] - r2[6][i]*movingsd30[i] - r2[7][i]*movingsd60[i]
+    score.append(df)
