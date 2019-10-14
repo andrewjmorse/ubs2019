@@ -150,6 +150,18 @@ sectorscore = [] # list of sector scores for each day
 for df in score:
     sectorscore.append(df.sum(axis=1))
 
+# create numpy array to rank sectors by day
+sectorranks = np.empty((len(sectorscore),len(sectorscore[0])))
+
+# add sector scores to array
+for i in range(len(sectorscore)):
+    sectorranks[i,] = sectorscore[i]
+
+sectorranks = np.transpose(sectorranks) # transpose array to make consistent
+sectorranks = np.flip(sectorranks.argsort(axis=1),axis=1) # sort each day by sector index
+sectorranks = pd.DataFrame(data=sectorranks)
+sectorranks.set_index(sectorscore[0].index, inplace=True) # make index consistent
+
 ric = 'AAP' # stock ticker to display
 
 # plot
