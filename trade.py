@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
 
 startingcapital = 10000000
 capital = startingcapital # initialize starting capital
@@ -89,8 +90,6 @@ def buy(day, nsectors=3, nstocks=3, tcost=1.0, agg=1.0):
 
     return
 
-buy(7)
-
 # function run daily to sell
 # day = day of analysis, nsectors = number of sectors to buy from, force = logical operator: must sell all if true
 def sell(day, nsectors=3, force=False):
@@ -113,6 +112,8 @@ def sell(day, nsectors=3, force=False):
             del ownedstocks[i-j]
             j += 1
 
+capitaltrack = np.concatenate(([capital, capital, capital, capital, capital, capital, capital], np.empty(369)))
+
 # run the simulation
 for i in range(len(sectorrank)):
     if i < 7: # do not trade until our model has data
@@ -120,9 +121,31 @@ for i in range(len(sectorrank)):
 
     # sell owned, then reinvest
     sell(i)
+
+    capitaltrack[i] = capital
+    for j in ownedstocks:
+        capitaltrack[i] += j[2] * prices[j[1]][i]
+
     buy(i)
 
     if (i == len(sectorrank) - 1): # if it is the final period, sell all stock
         sell(i, force=True)
+
+capitaltrack = pd.DataFrame(data=capitaltrack)
+capitaltrack.set_index(pd.to_datetime(sectorrank.index), inplace=True)
+
+# store MSCI world index data
+msci = pd.read_csv('historyIndex.csv')[562:581]
+msci.set_index(pd.to_datetime(msci.Date), inplace=True) # index date
+msci = msci.drop(['Date'], axis=1) # remove bad columns
+msci.columns = ['close'] # rename value for simplicity
+msci.close = pd.to_numeric(msci.close)
+
+plt.plot(capitaltrack / startingcapital)
+plt.plot(msci / msci['close'][0])
+plt.legend(['Adjusted return', "Adjusted MSCI index"])
+plt.ylabel('Relative value')
+plt.title('Returns and MSCI Over Time')
+plt.show()
 
 print(capital / startingcapital)
