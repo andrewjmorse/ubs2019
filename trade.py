@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import os
 
-capital = 10000000 # initialize starting capital
+startingcapital = 10000000
+capital = startingcapital # initialize starting capital
 
 # lists of scores and stock ranks, by sector
 score = []
@@ -123,3 +124,5 @@ for i in range(len(sectorrank)):
 
     if (i == len(sectorrank) - 1): # if it is the final period, sell all stock
         sell(i, force=True)
+
+print(capital / startingcapital)
