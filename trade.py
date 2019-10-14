@@ -133,6 +133,7 @@ for i in range(len(sectorrank)):
 
 capitaltrack = pd.DataFrame(data=capitaltrack)
 capitaltrack.set_index(pd.to_datetime(sectorrank.index), inplace=True)
+capitaltrack.columns = ['value']
 
 # store MSCI world index data
 msci = pd.read_csv('historyIndex.csv')[562:581]
@@ -149,3 +150,34 @@ plt.title('Returns and MSCI Over Time')
 plt.show()
 
 print(capital / startingcapital)
+
+from operator import itemgetter
+import re
+
+# converts values for read
+def dataconverter(s):
+    try:
+        return float(s) / 100
+    except Exception:
+        return np.nan
+
+def get_daily_10yr_treasury_data():
+    """Download daily 10 year treasury rates from the Federal Reserve and
+    return a pandas.Series."""
+    url = "https://www.federalreserve.gov/datadownload/Output.aspx?rel=H15"           "&series=bcb44e57fb57efbe90002369321bfb3f&lastObs=&from=&to="           "&filetype=csv&label=include&layout=seriescolumn"
+    return pd.read_csv(url, header=5, index_col=0, names=['DATE', 'BC_10YEAR'],
+                       parse_dates=True, converters={1: dataconverter},
+                       squeeze=True)
+
+# generate list of risk-free asset values (treasury bond)
+riskfree = get_daily_10yr_treasury_data()
+riskfree = riskfree['2016-11-01':'2018-05-01'] # get rows in range
+riskfree.fillna(method='bfill', inplace=True) # impute backfill values
+riskfree = pd.DataFrame(data=riskfree)
+riskfree.columns = ['value'] # convert to dataframe and rename
+
+# calculate sharpe ratio
+annualreturn = (1 + ((capitaltrack.value[len(capitaltrack) - 1] / startingcapital) - (capitaltrack.value[0] / startingcapital)) / len(capitaltrack))**252.75 - 1
+stdreturn = np.std(capitaltrack.value / startingcapital)
+sharpe = (annualreturn - np.mean(riskfree)) / stdreturn
+print(sharpe)
