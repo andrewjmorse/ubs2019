@@ -150,8 +150,6 @@ plt.ylabel('Relative value')
 plt.title('Returns and MSCI Over Time')
 plt.show()
 
-print(capital / startingcapital)
-
 from operator import itemgetter
 import re
 
@@ -182,6 +180,8 @@ annualreturn = (1 + ((capitaltrack.value[len(capitaltrack) - 1] / startingcapita
 stdreturn = np.std(capitaltrack.value / startingcapital)
 sharpe = (annualreturn - np.mean(riskfree)) / stdreturn
 print(sharpe)
+
+print(capital / startingcapital) # print final return
 
 # create normalized return data frame
 adjreturn = capitaltrack / startingcapital
