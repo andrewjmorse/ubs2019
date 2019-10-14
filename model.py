@@ -144,11 +144,21 @@ for i in range(len(sectors)):
                r2[6][i]*movingsd30[i].fillna(0) - r2[7][i]*movingsd60[i].fillna(0))
     score.append(df) # add df for each sector
 
+sectorscore = [] # list of sector scores for each day
+
+# get net sector score
+for df in score:
+    sectorscore.append(df.sum(axis=1))
+
 ric = 'AAP' # stock ticker to display
 
 # plot
 plt.plot(sectors[0][ric])
 plt.plot(score[0][ric])
+plt.hlines(0, xmin='2016-11', xmax='2018-05')
+plt.show()
+
+plt.plot(sectorscore[0])
 plt.hlines(0, xmin='2016-11', xmax='2018-05')
 plt.show()
 # scores have no inherent meaning, but have meaning relative to each other
