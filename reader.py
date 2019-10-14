@@ -48,7 +48,7 @@ if not os.path.exists(os.path.dirname('Stocks/')):
 # get all stock data
 for ric in sp500:
     RESOURCE_ENDPOINT = "https://dsa-stg-edp-api.fr-nonprod.aws.thomsonreuters.com/data/historical-pricing/beta1/views/summaries/" + ric
-    access_token = '24gVivI3O321esiIx9NSI2JIom3HkfkFpxOwNKF5'
+    access_token = 'REDACTED' # replace with a valid token
 
     if os.path.exists('Stocks/{}.csv'.format(ric)) or os.path.exists('Stocks/{}.O.csv'.format(ric)):
         continue

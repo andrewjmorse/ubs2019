@@ -9,12 +9,6 @@ import statsmodels.regression.linear_model as sm
 # create a list for the sector dataframes
 sectors = []
 
-# store MSCI world index data
-msci = pd.read_csv('historyIndex.csv')[550:581]
-msci.set_index(pd.to_datetime(msci.Date), inplace=True) # index date
-msci = msci.drop(['Date'], axis=1) # remove bad columns
-msci.columns = ['close'] # rename value for simplicity
-
 # read and format sector dataframes
 for file in os.listdir('Sectors/'):
     tmp = pd.read_csv('Sectors/{}'.format(file))
