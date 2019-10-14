@@ -50,10 +50,10 @@ ownedstocks = []
 # day = day of analysis, nsectors = number of sectors to buy from, nstocks = number of stocks to buy per sector,
 # tcost = transaction cost, as a percentage above 1, agg = proportion of capital to invest each period
 def buy(day, nsectors=3, nstocks=3, tcost=1.0, agg=1.0):
-    global capital
-    bestsectors = []
-    beststocks = []
-    scorelist = []
+    global capital # declare capital to pass value
+    bestsectors = [] # list of best performing sectors
+    beststocks = [] # list of best performing stocks within sectors
+    scorelist = [] # list of scores of best stocks
     for i in range(nsectors):
         bestsectors.append(sectorrank[str(i)][day])
     for i in bestsectors:
@@ -75,19 +75,41 @@ def buy(day, nsectors=3, nstocks=3, tcost=1.0, agg=1.0):
     investval = [] # amount of capital to invest in each stock
     ninvest = [] # quantity of each stock to buy
 
-    # add stocks to list of owned stocks
+    # calculate above figures
     for i in range(len(scorelist)):
         prop.append(scorelist[i] / np.sum(scorelist))
         investval.append(capital*agg*prop[i])
         ninvest.append(int(np.floor(investval[i] / (tcost * prices[score[beststocks[i][0]].columns[beststocks[i][1]]][day]))))
 
-    # decrement capital after purchase
+    # decrement capital after purchase, add stocks to list of owned stocks
     for i in range(len(beststocks)):
-        ownedstocks.append([score[beststocks[i][0]].columns[beststocks[i][1]], ninvest[i]])
+        ownedstocks.append([beststocks[i][0], score[beststocks[i][0]].columns[beststocks[i][1]], ninvest[i]])
         capital -= ninvest[i] * tcost * prices[score[beststocks[i][0]].columns[beststocks[i][1]]][day]
+
+    return
 
 buy(7)
 
-def sell(day):
-    0
-    # TODO: this
+# function run daily to sell
+# day = day of analysis, nsectors = number of sectors to buy from
+def sell(day, nsectors=3):
+    if not ownedstocks: # if there is nothing to sell, sell nothing
+        return
+
+    global capital # declare capital to pass value
+    bestsectors = [] # list of best performing sectors
+
+    # generate list of best sectors
+    for i in range(nsectors):
+        bestsectors.append(sectorrank[str(i)][day])
+
+    j = 0 # count number of tickers sold
+
+    # if a stock is not in the best sectors, sell it
+    for i in range(len(ownedstocks)):
+        if not ownedstocks[i-j][0] in bestsectors:
+            capital += ownedstocks[i-j][2] * prices[ownedstocks[i-j][1]][day]
+            del ownedstocks[i-j]
+            j += 1
+
+sell(14)
