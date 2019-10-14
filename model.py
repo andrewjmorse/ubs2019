@@ -11,7 +11,7 @@ sectors = []
 
 # store MSCI world index data
 msci = pd.read_csv('historyIndex.csv')[550:581]
-msci.set_index(pd.to_datetime(msci.Date), inplace=True)
+msci.set_index(pd.to_datetime(msci.Date), inplace=True) # index date
 msci = msci.drop(['Date'], axis=1) # remove bad columns
 msci.columns = ['close'] # rename value for simplicity
 
@@ -19,7 +19,7 @@ msci.columns = ['close'] # rename value for simplicity
 for file in os.listdir('Sectors/'):
     tmp = pd.read_csv('Sectors/{}'.format(file))
     tmp = tmp.drop(['Unnamed: 0'], axis=1) # remove bad columns
-    tmp.set_index(pd.to_datetime(tmp.date), inplace=True)
+    tmp.set_index(pd.to_datetime(tmp.date), inplace=True) # index date
     tmp = tmp.drop(['date'], axis=1)
     sectors.append(tmp)
 
@@ -65,6 +65,8 @@ for x in [movingsd7, movingsd14, movingsd30, movingsd60]:
     i += 1 # move to next window
 
 i = 0
+
+### LEGACY CODE ########################################################################################################
 
 for x in [movingdd7, movingdd14, movingdd30, movingdd60]:
     for y in sectors:
@@ -117,32 +119,32 @@ for x in [movingdif7, movingdif14, movingdif30, movingdif60]:
 # plt.legend([ric,'{} days'.format(dist[0]),'{} days'.format(dist[1]),'{} days'.format(dist[2]),'{} days'.format(dist[3])])
 # plt.show()
 
+### END LEGACY CODE ####################################################################################################
+
 r2 = [] # list of lists of Pearson's r**2, separated by predictor and then by sector
 
 for x in [moving7, moving14, moving30, moving60, movingsd7, movingsd14, movingsd30, movingsd60]:
-    sectorr2 = [] # list of r**2 for each sector
+    sector_r2 = [] # list of r**2 for each sector
     for i in range(len(x)):
         stockr2 = [] # list of r**2 for each stock
         for col in x[i]:
-            # model = sm.GLS(sectors[i][col],x[i][col],missing='drop') # predict stock value from predictor, using GLS
-            # result = model.fit()
-            model2 = sm.GLS(movingdif7[i][col].shift(periods=7), x[i][col], missing='drop') # predict again, shifted a week ahead
-            result2 = model2.fit()
-            # stockr2.append((result.rsquared_adj + result2.rsquared_adj) / 2)  # extract model r**2
-            stockr2.append(result2.rsquared_adj)  # extract model r**2
-        stockr2 = np.array(stockr2)
-        sectorr2.append(np.mean(stockr2))
-    r2.append(sectorr2)
+            model = sm.GLS(movingdif7[i][col].shift(periods=7), x[i][col], missing='drop') # predict again, shifted a week ahead
+            result = model.fit()
+            stockr2.append(result.rsquared_adj)  # extract model r**2
+        stockr2 = np.array(stockr2) # convert to array to use numpy operations
+        sector_r2.append(np.mean(stockr2))
+    r2.append(sector_r2)
 
 score = [] # list of dataframes of day-to-day score by date
 
 for i in range(len(sectors)):
-    # use fitted weights to score each stock
-    df = 10 * (r2[0][i]*moving7[i].fillna(0) + r2[1][i]*moving14[i].fillna(0) + r2[2][i]*moving30[i].fillna(0) + r2[3][i]*moving60[i].fillna(0) - r2[4][i]*movingsd7[i].fillna(0) \
-         - r2[5][i]*movingsd14[i].fillna(0) - r2[6][i]*movingsd30[i].fillna(0) - r2[7][i]*movingsd60[i].fillna(0))
-    score.append(df)
+    # use fitted weights to score each stock; scaled by 10 for visibility
+    df = 10 * (r2[0][i]*moving7[i].fillna(0) + r2[1][i]*moving14[i].fillna(0) + r2[2][i]*moving30[i].fillna(0) + \
+               r2[3][i]*moving60[i].fillna(0) - r2[4][i]*movingsd7[i].fillna(0) - r2[5][i]*movingsd14[i].fillna(0) - \
+               r2[6][i]*movingsd30[i].fillna(0) - r2[7][i]*movingsd60[i].fillna(0))
+    score.append(df) # add df for each sector
 
-ric = 'AMZN' # stock ticker to display
+ric = 'AAP' # stock ticker to display
 
 # plot
 plt.plot(sectors[0][ric])
