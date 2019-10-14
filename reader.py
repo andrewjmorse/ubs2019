@@ -52,7 +52,7 @@ for ric in sp500:
 
     if os.path.exists('Stocks/{}.csv'.format(ric)) or os.path.exists('Stocks/{}.O.csv'.format(ric)):
         continue
-    # try without .O, then with .O; idk, database quirk
+    # try without .O, then with .O
     try:
         start_date = '2016-11-01'
         end_date = '2018-05-01'
@@ -109,7 +109,7 @@ for ric in sp500:
 if not os.path.exists(os.path.dirname('Sectors/')):
     os.makedirs(os.path.dirname('Sectors/'))
 
-y = 0 # stupid counter because pandas is bad
+y = 0 # counter to interface with pandas
 
 # create sector files
 for x in [comm,cd,cs,en,fin,hc,ind,it,mat,re,util]:

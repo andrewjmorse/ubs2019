@@ -112,6 +112,7 @@ def sell(day, nsectors=3, force=False):
             del ownedstocks[i-j]
             j += 1
 
+# initializes an empty array to track capital
 capitaltrack = np.concatenate(([capital, capital, capital, capital, capital, capital, capital], np.empty(369)))
 
 # run the simulation
