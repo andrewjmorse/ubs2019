@@ -91,8 +91,8 @@ def buy(day, nsectors=3, nstocks=3, tcost=1.0, agg=1.0):
 buy(7)
 
 # function run daily to sell
-# day = day of analysis, nsectors = number of sectors to buy from
-def sell(day, nsectors=3):
+# day = day of analysis, nsectors = number of sectors to buy from, force = logical operator: must sell all if true
+def sell(day, nsectors=3, force=False):
     if not ownedstocks: # if there is nothing to sell, sell nothing
         return
 
@@ -107,9 +107,19 @@ def sell(day, nsectors=3):
 
     # if a stock is not in the best sectors, sell it
     for i in range(len(ownedstocks)):
-        if not ownedstocks[i-j][0] in bestsectors:
+        if not ownedstocks[i-j][0] in bestsectors or force:
             capital += ownedstocks[i-j][2] * prices[ownedstocks[i-j][1]][day]
             del ownedstocks[i-j]
             j += 1
 
-sell(14)
+# run the simulation
+for i in range(len(sectorrank)):
+    if i < 7: # do not trade until our model has data
+        continue
+
+    # sell owned, then reinvest
+    sell(i)
+    buy(i)
+
+    if (i == len(sectorrank) - 1): # if it is the final period, sell all stock
+        sell(i, force=True)
