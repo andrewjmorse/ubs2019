@@ -162,6 +162,22 @@ sectorranks = np.flip(sectorranks.argsort(axis=1),axis=1) # sort each day by sec
 sectorranks = pd.DataFrame(data=sectorranks)
 sectorranks.set_index(sectorscore[0].index, inplace=True) # make index consistent
 
+# create list of ranks of stocks within sectors
+stockranks = []
+
+# rank stocks within sectors
+for df in score:
+    tmp = np.empty((len(df.columns), len(df))) # create numpy array to list ranks
+    i = 0
+    for col in df.columns: # add stock scores to array
+        tmp[i,] = df[col]
+        i += 1
+    tmp = np.transpose(tmp) # transpose array to make consistent
+    tmp = np.flip(tmp.argsort(axis=1), axis=1) # sort each day by stock index
+    tmp = pd.DataFrame(data=tmp)
+    tmp.set_index(df.index, inplace=True) # make index consistent
+    stockranks.append(tmp) # add the sector dataframe to the list
+
 ric = 'AAP' # stock ticker to display
 
 # plot
