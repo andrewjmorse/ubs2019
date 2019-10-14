@@ -181,3 +181,9 @@ annualreturn = (1 + ((capitaltrack.value[len(capitaltrack) - 1] / startingcapita
 stdreturn = np.std(capitaltrack.value / startingcapital)
 sharpe = (annualreturn - np.mean(riskfree)) / stdreturn
 print(sharpe)
+
+# create normalized return data frame
+adjreturn = capitaltrack / startingcapital
+
+# write return csv
+adjreturn.to_csv('strategyvalue.csv')
