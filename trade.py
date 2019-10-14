@@ -48,8 +48,8 @@ ownedstocks = []
 
 # function run daily to buy
 # day = day of analysis, nsectors = number of sectors to buy from, nstocks = number of stocks to buy per sector,
-# tcost = transaction cost, as a percentage above 1
-def buy(day, nsectors=3, nstocks=3, tcost=1.0):
+# tcost = transaction cost, as a percentage above 1, agg = proportion of capital to invest each period
+def buy(day, nsectors=3, nstocks=3, tcost=1.0, agg=1.0):
     global capital
     bestsectors = []
     beststocks = []
@@ -78,10 +78,16 @@ def buy(day, nsectors=3, nstocks=3, tcost=1.0):
     # add stocks to list of owned stocks
     for i in range(len(scorelist)):
         prop.append(scorelist[i] / np.sum(scorelist))
-        investval.append(capital*prop[i])
+        investval.append(capital*agg*prop[i])
         ninvest.append(int(np.floor(investval[i] / (tcost * prices[score[beststocks[i][0]].columns[beststocks[i][1]]][day]))))
 
     # decrement capital after purchase
     for i in range(len(beststocks)):
         ownedstocks.append([score[beststocks[i][0]].columns[beststocks[i][1]], ninvest[i]])
         capital -= ninvest[i] * tcost * prices[score[beststocks[i][0]].columns[beststocks[i][1]]][day]
+
+buy(7)
+
+def sell(day):
+    0
+    # TODO: this
