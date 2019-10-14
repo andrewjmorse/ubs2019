@@ -141,8 +141,12 @@ for x in [moving7, moving14, moving30, moving60, movingsd7, movingsd14, movingsd
         sectorr2.append(np.mean(stockr2))
     r2.append(sectorr2)
 
-score = [] # list of dataframes of day-to-day score date
+score = [] # list of dataframes of day-to-day score by date
 
 for i in range(len(sectors)):
-    df = r2[0][i]*moving7[i] + r2[1][i]*moving14[i] + r2[2][i]*moving30[i] + r2[3][i]*moving60[i] - r2[4][i]*movingsd7[i] - r2[5][i]*movingsd14[i] - r2[6][i]*movingsd30[i] - r2[7][i]*movingsd60[i]
+    # use fitted weights to score each stock
+    df = r2[0][i]*moving7[i].fillna(0) + r2[1][i]*moving14[i].fillna(0) + r2[2][i]*moving30[i].fillna(0) + r2[3][i]*moving60[i].fillna(0) - r2[4][i]*movingsd7[i].fillna(0) \
+         - r2[5][i]*movingsd14[i].fillna(0) - r2[6][i]*movingsd30[i].fillna(0) - r2[7][i]*movingsd60[i].fillna(0)
     score.append(df)
+
+# scores have no inherent meaning, but have meaning relative to each other
