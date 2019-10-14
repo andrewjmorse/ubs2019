@@ -8,6 +8,8 @@ Stocks
 
 *.csv
 
+!SP500.csv
+
 .idea
 
 venv
