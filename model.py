@@ -190,3 +190,31 @@ plt.plot(sectorscore[0])
 plt.hlines(0, xmin='2016-11', xmax='2018-05')
 plt.show()
 # scores have no inherent meaning, but have meaning relative to each other
+
+# create list of sector names to write
+sectornames = np.empty(len(sectors), dtype=np.dtype('U8'))
+i = 0 # initialize counter
+
+# read sector names from file
+for file in os.listdir('Sectors/'):
+    sectornames[i] = (file.split('.')[0])
+    i += 1
+
+# create directories if necessary
+if not os.path.exists(os.path.dirname('Scores/Scores/')):
+    os.makedirs(os.path.dirname('Scores/Scores/'))
+
+if not os.path.exists(os.path.dirname('Scores/Ranks/')):
+    os.makedirs(os.path.dirname('Scores/Ranks/'))
+
+# save sector names
+sectornames = pd.DataFrame(data=sectornames)
+sectornames.to_csv('Scores/sectornames.csv')
+
+# save sector ranks
+sectorranks.to_csv('Scores/sectorranks.csv')
+
+# save raw scores and stock ranks
+for i in range(len(sectors)):
+    score[i].to_csv('Scores/Scores/{}_scores.csv'.format(sectornames[0][i]))
+    stockranks[i].to_csv('Scores/Ranks/{}_ranks.csv'.format(sectornames[0][i]))
