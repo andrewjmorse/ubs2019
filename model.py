@@ -172,19 +172,20 @@ for df in score:
     tmp.set_index(df.index, inplace=True) # make index consistent
     stockranks.append(tmp) # add the sector dataframe to the list
 
-ric = 'AAP' # stock ticker to display
+### LEGACY CODE ########################################################################################################
+# ric = 'AAP' # stock ticker to display
+#
+# # plot
+# plt.plot(sectors[0][ric])
+# plt.plot(score[0][ric])
+# plt.hlines(0, xmin='2016-11', xmax='2018-05')
+# plt.show()
+#
+# plt.plot(sectorscore[0])
+# plt.hlines(0, xmin='2016-11', xmax='2018-05')
+# plt.show()
 
-# plot
-plt.plot(sectors[0][ric])
-plt.plot(score[0][ric])
-plt.hlines(0, xmin='2016-11', xmax='2018-05')
-plt.show()
-
-plt.plot(sectorscore[0])
-plt.hlines(0, xmin='2016-11', xmax='2018-05')
-plt.show()
 # scores have no inherent meaning, but have meaning relative to each other
-
 # create list of sector names to write
 sectornames = np.empty(len(sectors), dtype=np.dtype('U8'))
 i = 0 # initialize counter
